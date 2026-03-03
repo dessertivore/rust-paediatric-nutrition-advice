@@ -1,0 +1,16 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.8"
+chrono = "0.4.44"
+serde = "1.0.228"
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls"] }
+tokio = { version = "1", features = ["full"] }
+
+[[bin]]
+name = "backend"
+path = "src/main.rs"
+

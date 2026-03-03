@@ -1,12 +1,7 @@
-[package]
-name = "rust-paediatric-nutrition-advice"
-version = "0.1.0"
-edition = "2024"
 
-[dependencies]
-axum = "0.8.8"
-tokio = { version = "1", features = ["full"] }
-
-[[bin]]
-name = "rust-paediatric-nutrition-advice"
-path = "main.rs"
+[workspace]
+members = [
+    "backend",
+    "frontend",
+]
+resolver = "3"

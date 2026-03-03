@@ -1,0 +1,12 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = "1.0.228"
+serde_json = "1.0.149"
+trunk = "0.21.14"
+web-sys = { version = "0.3.91", features = ["HtmlInputElement", "HtmlSelectElement"] }
+yew = { version = "0.22.1", features = ["csr"] }
+
