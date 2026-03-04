@@ -39,10 +39,13 @@ Retrieve the recommended nutrient intake for a child based on their age and the 
 
 ## Plans
 
-- Save nutrients into a DB
 - Support for more nutrients
-- ?Build a frontend in Rust
-- Other recommendations
-- ?Add a child
+- Build more of a frontend in Rust/Yew
+- Other nutritional recommendations
+- Create DB for storing child profiles
+- Recommendation page for a given child profile
 - Unit tests
 - Integration tests
+
+Very basic frontend so far:
+<img width="401" height="340" alt="image" src="https://github.com/user-attachments/assets/29574d6b-86d5-40bf-a326-6edf5062bb5e" />
