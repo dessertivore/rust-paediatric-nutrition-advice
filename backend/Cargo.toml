@@ -5,9 +5,10 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.8"
-chrono = "0.4.44"
-serde = "1.0.228"
-sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls"] }
+diesel = { version = "2.3.6", features = ["postgres","chrono"] }
+chrono = { version= "0.4.44" , features = ["serde"]}
+dotenvy = "0.15"
+serde = { version = "1.0.228" , features = ["derive"]}
 tokio = { version = "1", features = ["full"] }
 
 [[bin]]

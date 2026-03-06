@@ -1,13 +1,19 @@
 use axum::{
     Router,
     extract::{Json, Path, State},
-    http::StatusCode,
     routing::{get, post},
 };
-use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Pool};
-use std::net::SocketAddr;
+use backend::schema::child_profiles;
+use core::time;
+use diesel::prelude::*;
+use dotenvy::dotenv;
+use serde::Deserialize;
+use serde::Serialize;
+use std::env;
+use std::sync::Arc;
+use tokio;
+// 0 = male
+// 1 = female
 
 #[tokio::main]
 async fn main() {
@@ -48,41 +54,42 @@ struct CreateUser {
     gender: String,
 }
 
-#[derive(Serialize)]
-struct UserResponse {
-    id: i32,
+#[derive(Clone, PartialEq, Serialize, Default)]
+struct ChildProfileInput {
     name: String,
     birthday: String,
-    gender: String,
+    gender: bool,
+    weight: Option<f32>,
+    height: Option<f32>,
 }
 
-async fn create_user(Json(payload): Json<CreateUser>) -> Result<Json<UserResponse>, StatusCode> {
-    let database_url = "postgres://test_user:test_password@localhost:5432/rust-nutrition";
-    let pool = PgPool::connect(database_url).await;
-    let birthday: NaiveDate = NaiveDate::parse_from_str(&payload.birthday, "%Y-%m-%d")
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
-    let name: String = payload.name;
-    let gender: String = payload.gender;
-    // // Insert the user into the database
-    // let row = sqlx::query!(
-    //     r#"
-    //     INSERT INTO users (name, birthday, gender)
-    //     VALUES ($1, $2, $3)
-    //     RETURNING id, name, birthday, gender
-    //     "#,
-    //     name,
-    //     birthday,
-    //     gender
-    // )
-    // .fetch_one(&pool)
-    // .await
-    // .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+#[derive(Queryable, Insertable, Serialize, Deserialize)]
+#[diesel(table_name = backend::schema::child_profiles)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct ChildProfile {
+    pub id: i32,
+    pub name: String,
+    pub birthday: chrono::NaiveDate,
+    pub gender: bool,
+    pub weight: Option<f32>,
+    pub height: Option<f32>,
+}
 
-    // Return the created user as a response
-    Ok(Json(UserResponse {
-        id: 1,
-        name: "test".to_string(),
-        birthday: "1/1/10".to_string(),
-        gender: "test".to_string(),
-    }))
+pub async fn create_child_profile(
+    Json(profile): Json<ChildProfile>,
+) -> Result<(), axum::http::StatusCode> {
+    let conn = &mut establish_connection();
+    diesel::insert_into(child_profiles::table)
+        .values(&profile)
+        .execute(conn)
+        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(())
+}
+
+pub fn establish_connection() -> PgConnection {
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
